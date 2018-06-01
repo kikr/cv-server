@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+  sut:
+    # Configuration options that are applied at build time.
+    # Use the Dockerfile from this dir
+    build: .
+    # Override entry point to explicitly use npm
+    entrypoint: npm
+    # Run npm command
+    command: test

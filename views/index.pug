@@ -1,0 +1,13 @@
+html
+	head
+		title=title
+	body
+		h1=message
+
+		a(href='/users/') Show users
+
+		p=toast
+
+		form(action="/users/" method="post")
+			input(type="text" name="name" placeholder="Your name")
+			input(type="submit" value="Create user")

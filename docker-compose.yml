@@ -1,0 +1,40 @@
+version: '2.1'
+
+services:
+  cv-nodejs:
+    image: kikr/cv:latest
+    container_name: cv-nodejs
+    build: .
+    environment:
+      NODE_ENV: production
+    ports:
+      - 80:80
+    networks:
+     - cv-app-net
+    environment:
+      # DB host should match the service name
+      DATABASE_URL: mongodb://cv-mongodb:27017
+    depends_on:
+      - cv-mongodb
+  cv-mongodb:
+    image: mongo:3.6.5
+    container_name: cv-mongodb
+    ports:
+      - 27017:27017
+    networks:
+     - cv-app-net
+    volumes:
+      # MongoDB's default location for data is /data/db/
+      - mongo_data:/data/db
+networks: 
+  cv-app-net:
+    name: cv-app-net
+    driver: bridge
+
+volumes:
+  # On OSX and Windows you can use a named volume so that docker will persist the data to the VM's hard disk
+  # -https://github.com/docker-library/mongo/issues/235
+  # We must store data to VM, otherwise using volumes for mongo data doesn't work
+  # Problem with storing to Windows: https://github.com/docker/for-win/issues/138
+  # More about issues on Windows: https://github.com/docker-library/docs/tree/master/mongo#where-to-store-data
+  mongo_data:
