@@ -28,8 +28,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+const CvSchema = mongoose.Schema({
+  title: String
+});
+
 const UserSchema = mongoose.Schema({
-  name: String
+  firstName: String,
+  lastName: String,
+  cv: CvSchema
 });
   //Compile schema into a model
 const User = mongoose.model('User', UserSchema);
@@ -37,29 +43,9 @@ const User = mongoose.model('User', UserSchema);
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
+app.get('/cvs/', function (req, res) {
+  console.log('Returning CVs...');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
 
-app.set('view engine', 'pug');
-
-app.get('/', function (req, res) {
-  res.render('index', { title: 'Hey', message: 'Hello there!' })
-});
-
-app.post('/users/', function (req, res) {
-
-  User.create(req.body);
-
-  res.render('index', { title: 'User added', message: 'Hello there!', toast: 'User added successfully' })
-});
-
-app.get('/users/', function (req, res) {
-  User.find(function (err, users) {
-    let userNames = "";
-    if (err) return console.error(err);
-    
-    users.forEach((user) => {
-      userNames = userNames + `${user.name} & `;
-    });
-    res.render('users', { title: 'All users', userNames: userNames })
-  });
-
+  User.find({}).then(users => res.json(users));
 });
