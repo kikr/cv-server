@@ -24,45 +24,50 @@ const app = express();
  * Parses the text as URL encoded data (which is how browsers tend to send form data from regular forms set to POST)
  * and exposes the resulting object (containing the keys and values) on req.body
  */
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
+app.use(bodyParser.json());
 
-const CvSchema = mongoose.Schema({
-  title: String
+// Allow CORS
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
 });
+
 
 const UserSchema = mongoose.Schema({
   firstName: String,
   lastName: String,
-  cv: CvSchema
 });
-  //Compile schema into a model
-const User = mongoose.model('User', UserSchema);
+
+const CvSchema = mongoose.Schema({
+  title: String,
+  user: UserSchema
+});
+//Compile schema into a model
+const Cv = mongoose.model('Cv', CvSchema);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
 app.post('/cvs', function (req, res) {
   console.log('Creating CV...');
-  const cvTitle = req.body.title;
 
-  User.create({ 
-    firstName: req.body.firstName, 
-    lastName: req.body.lastName, 
-    cv: [{ title: cvTitle }]
+  Cv.create({ 
+    title: req.body.title,
+    user: { 
+      firstName: req.body.user.firstName, 
+      lastName: req.body.user.lastName,
+    }
   })
-  .then(user => res.send(user))
+  .then(cv => res.send(cv))
   .catch(err => res.send(err));
 });
 
 app.get('/cvs', function (req, res) {
   console.log('Returning CVs...');
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
 
-  User
+  Cv
   .find()
-  .populate('cv')
-  .then(users => res.json(users))
+  .then(cvs => res.send(cvs))
   .catch(err => res.send(err));
 });
