@@ -25,7 +25,7 @@ const app = express();
  * and exposes the resulting object (containing the keys and values) on req.body
  */
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: false
 }));
 
 const CvSchema = mongoose.Schema({
@@ -43,9 +43,26 @@ const User = mongoose.model('User', UserSchema);
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
-app.get('/cvs/', function (req, res) {
+app.post('/cvs', function (req, res) {
+  console.log('Creating CV...');
+  const cvTitle = req.body.title;
+
+  User.create({ 
+    firstName: req.body.firstName, 
+    lastName: req.body.lastName, 
+    cv: [{ title: cvTitle }]
+  })
+  .then(user => res.send(user))
+  .catch(err => res.send(err));
+});
+
+app.get('/cvs', function (req, res) {
   console.log('Returning CVs...');
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
 
-  User.find({}).then(users => res.json(users));
+  User
+  .find()
+  .populate('cv')
+  .then(users => res.json(users))
+  .catch(err => res.send(err));
 });
