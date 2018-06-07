@@ -1,9 +1,25 @@
 version: '2.1'
 
 services:
-  cv-nodejs:
+  # Should match with the Dockerfile
+  # https://github.com/kikr/cv/blob/master/Dockerfile
+  cv:
     image: kikr/cv:latest
-    container_name: cv-nodejs
+    container_name: cv
+    build: .
+    environment:
+      NODE_ENV: production
+    ports:
+      # Host:container
+      # Map container-part to exposed port of the Dockerfile
+      - 8080:80
+    networks:
+     - cv-app-net
+    depends_on:
+      - cv-server
+  cv-server:
+    image: kikr/cv-server:latest
+    container_name: cv-server
     build: .
     environment:
       NODE_ENV: production
