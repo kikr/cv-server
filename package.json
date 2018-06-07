@@ -1,6 +1,6 @@
 {
-	"name": "cv",
-	"version": "0.1.0",
+	"name": "cv-server",
+	"version": "0.2.0",
 	"description": "App for saving employee CVs to a DB",
 	"author": "Kim <kim@example.com>",
 	"main": "server.js",
