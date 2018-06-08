@@ -26,6 +26,15 @@ const app = express();
  */
 app.use(bodyParser.json());
 
+// User's past work project
+const ProjectSchema = mongoose.Schema({
+  title: String,
+  // When did the project start 
+  start: Date,
+  // When did it end
+  end: Date,
+  description: String
+});
 
 const UserSchema = mongoose.Schema({
   firstName: String,
@@ -34,7 +43,8 @@ const UserSchema = mongoose.Schema({
 
 const CvSchema = mongoose.Schema({
   title: String,
-  user: UserSchema
+  user: UserSchema,
+  projects: [ ProjectSchema ]
 });
 //Compile schema into a model
 const Cv = mongoose.model('Cv', CvSchema);
@@ -50,7 +60,8 @@ app.post('/cvs', function (req, res) {
     user: { 
       firstName: req.body.user.firstName, 
       lastName: req.body.user.lastName,
-    }
+    },
+    projects: req.body.projects
   })
   .then(cv => res.send(cv))
   .catch(err => res.send(err));
