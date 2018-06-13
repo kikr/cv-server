@@ -52,6 +52,31 @@ const Cv = mongoose.model('Cv', CvSchema);
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
+
+
+app.put('/cvs/:cvId', function (req, res, next) {
+  console.log('Updating CV...');
+  const cvId = req.params.cvId;
+
+  if(!cvId) return next(new Error('Missing CV ID'));
+
+  Cv.findByIdAndUpdate(cvId,
+     { $set: { 
+      title: req.body.title,
+      user: { 
+        firstName: req.body.user.firstName, 
+        lastName: req.body.user.lastName,
+      },
+      projects: req.body.projects
+    }}, 
+    { new: true },
+    function (err, cv) {
+      if (err) return next(err);
+      res.send(cv);
+    }
+  );
+});
+
 app.post('/cvs', function (req, res) {
   console.log('Creating CV...');
   const projects = req && req.body && Array.isArray(req.body.projects) && req.body.projects || [];
