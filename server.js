@@ -54,6 +54,12 @@ console.log(`Running on http://${HOST}:${PORT}`);
 
 app.post('/cvs', function (req, res) {
   console.log('Creating CV...');
+  const projects = req && req.body && Array.isArray(req.body.projects) && req.body.projects || [];
+
+  // Remove any client-generated IDs, because they're not actual ObjectIds
+  projects.forEach(project => {
+    project._id = undefined;
+  });
 
   Cv.create({ 
     title: req.body.title,
